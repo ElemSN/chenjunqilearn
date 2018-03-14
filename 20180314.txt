@@ -1,0 +1,103 @@
+概念题：
+fail-fast和fail-safe迭代器有什么区别？
+fail-fast 
+   fail-fast机制在遍历一个集合时，当集合结构被改变，会抛出Concurrent Modification Exception ,
+fail-fast 会在下面两种情况下抛出异常：
+1），单线程环境，集合在被创建后，在遍历他的过程中修改了结构，remove()方法会让expectModcount 和modcount 相等，所以不会抛出异常
+2），多线程环境，当一个线程在遍历这个集合，而另一个线程对这个集合的结构进行了修改，
+  迭代器在遍历过程中是直接访问内部数据的，因此内部的数据在遍历的过程中无法被修改，为了保证不被修改，迭代器内部维护了一个标记“mode”,当集合结构改变（添加删除或者修改），标记“mode”会被修改，而迭代器每次的hasNext()和next()方法会检查该”mode“是否被改变，当检测到被改变时，抛出ConcurrentModification Exception
+    fail-safe
+fail-safeie 任何对集合结构的修改都会在一个复制的集合上进行修改，因此不会抛出ComcurrentModificationException 异常
+但是fail-safe 有两个问题，
+1）需要复制集合，产生大量无效对象，开销大
+2）无法保证读取的数据是目前原始数据结构中的数据
+2。如何使用  Comparable  和  Comparator  接口对集合进行排序？
+Comparable 
+对实现该接口的类的对象进行整体排序，使用compareTo方法，当不能满足时，重写compareTo方法j
+Comparator 
+直接通过引用调用方法
+3.HashSet和TreeSet有什么区别？
+ HashSet是使用散列表进行存储，元素无序，元素允许为null。TreeSet是使用树结构来进行存储，元素按字符串顺序排序存储，元素不允许为null。
+利用TreeSet保存自定义类对象的时候，自定义所在的类一定要实现Comparable接口，如果没有实现这个接口那么就无法区分大小关系，而且在TreeSet中如果要进行排序，那么就要将所有的字段都进行比较，就是说在TreeSet中是依靠comparato()方法返回的是不是0来判断是不是重复元素的。
+
+4.解释LinkedList和ArrayList之间的区别。
+ArrayList是可以改变大小的数组，LinkedList是双向链接串列。
+因为Array是基于索引(index)的数据结构，它使用索引在数组中搜索和读取数据是很快的。Array获取数据的时间复杂度是O(1),但是要删除数据却是开销很大的，因为这需要重排数组中的所有数据。
+
+2) 相对于ArrayList，LinkedList插入是更快的。因为LinkedList不像ArrayList一样，不需要改变数组的大小，也不需要在数组装满的时候要将所有的数据重新装入一个新的数组，这是ArrayList最坏的一种情况，时间复杂度是O(n)，而LinkedList中插入或删除的时间复杂度仅为O(1)。ArrayList在插入数据时还需要更新索引（除了插入数组的尾部）。
+
+3) 类似于插入数据，删除数据时，LinkedList也优于ArrayList。
+
+4) LinkedList需要更多的内存，因为ArrayList的每个索引的位置是实际的数据，而LinkedList中的每个节点中存储的是实际的数据和前后节点的位置。
+8.哪些集合类是线程安全的？
+
+Vector、HashTable、Properties和Stack是同步类，所以它们是线程安全的，可以在多线程环境下使用。Java1.5并发API包括一些集合类，允许迭代时修改，因为它们都工作在集合的克隆上，所以它们在多线程环境中是安全的。
+
+9.并发集合类是什么？
+
+
+10.数组(Array)和列表集合(ArrayList)有什么区别
+1）Array是静态的数据结构，在创建Array对象后不能改变其大小。 
+ArrayList是动态的，当元素被加入ArrayList对象时，它的容量会自动增长。
+2）ArrayList不能包含基本数据类型。(如:int float double) 
+Array可以包含基本数据类型和对象
+3）ArrayList可以使用迭代器和for循环(包括for each循环) 
+Array使用for循环
+4）ArrayList是一维的,但可以嵌套
+Array是多维的
+11.Enumeration接口和Iterator接口的区别有哪些
+ 1）Enumeration 接口的作用与 Iterator 接口类似，但只提供了遍历 Vector 和 Hashtable 类型集合元素的功能，不支持元素的移除操作。 
+Iterator 接口添加了一个可选的移除操作，并使用较短的方法名。
+2）Enumeration速度是Iterator的2倍，同时占用更少的内存。但是，Iterator远远比Enumeration安全，因为其他线程不能够修改正在被iterator遍历的集合里面的对象。同时，Iterator允许调用者删除底层集合里面的元素，这对Enumeration来说是不可能的。
+
+
+阅读代码题：
+1.（List）写出下面程序的运行结果
+import java.util.*;
+public class TestList{
+public static void main(String args[]){
+List list = new ArrayList();
+list.add(“Hello”);
+list.add(“World”);
+list.add(“Hello”);
+list.add(“Learn”);
+list.remove(“Hello”);
+list.remove(0);
+for(int i = 0; i<list.size(); i++){
+System.out.println(list.get(i));
+}
+}
+}
+结果是：
+hello
+Learn
+Removes the first occurrence of the specified element from this list
+(从这个列表中删除指定元素的第一次出现)
+删除元素后后面的元素自动往前把集合补齐
+ 
+2. （Set，List）
+import java.util.*;
+public class TestListSet{
+public static void main(String args[]){
+List list = new ArrayList();
+list.add(“Hello”);
+list.add(“Learn”);
+list.add(“Hello”);
+list.add(“Welcome”);
+Set set = new HashSet();
+set.addAll(list);
+System.out.println(set.size());
+}
+}
+选择正确答案
+A． 编译不通过
+B． 编译通过，运行时异常
+C． 编译运行都正常，输出3
+D． 编译运行都正常，输出4
+结果：
+c
+Set对每个对象都只保留一次
+三、编程题
+1.集合实现约瑟夫环。
+
+
