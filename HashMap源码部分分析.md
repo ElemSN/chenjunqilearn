@@ -191,7 +191,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         Node<K,V> e;
         return (e = getNode(hash(key), key)) == null ? null : e.value;
     }
-
+    //HashMap将“key为null”的元素都放在table的位置0处，即table[0]中；“key不为null”的放在table的其余位置！
     final Node<K,V> getNode(int hash, Object key) {
         Node<K,V>[] tab; 
 		Node<K,V> first, e;
